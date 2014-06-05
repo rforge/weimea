@@ -1,0 +1,16 @@
+Package: weimea
+Type: Package
+Title: Weighted mean of species attributes
+Version: 0.3
+Date: 2014-06-05
+Author: David Zeleny
+Maintainer: David Zeleny <zeleny.david@gmail.com>
+Description: Allows calculation of weighted mean of species attributes, and
+    offers other functions handling weighted mean, e.g. when related to sample
+    attributes. Examples of use: community weighted mean of species traits,
+    mean Ellenberg indicator values etc.
+Imports:
+    vegan
+Depends:
+    vegan
+License: GPL-2
