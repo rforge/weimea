@@ -22,12 +22,12 @@
 data (vltava)
 }
 \description{
-Datasets with species composition of herbs in the forest understorey, their species Ellenberg indicator values, species functional traits (compiled from databases) and several measured environmental characteristics for each site.
+Datasets with species composition of forest vegetation, their species Ellenberg indicator values, species functional traits (compiled from databases only for herb species) and several measured environmental characteristics for each site.
 }
 \details{
-Vegetation plots, located in even distances along transects following the steep valley slopes of Vltava river valley and collected during 2001-2003. Each transect started at the valley bottom and end up at the upper part of the valley slope. Plots are of the size 10x15 m. In each plot, all species of tree, shrub and herb layer were recorded and their abundances were estimated using 9-degree ordinal Braun-Blanquette scale (these values were consequently transformed into percentage values). At each plot, various topographical and soil factors were measured or estimated (see Table below). The dataset contains 27 transects with 97 samples in total.
+Vegetation plots, located in even distances along transects following the steep valley slopes of Vltava river valley and collected during 2001-2003. Each transect started at the valley bottom and end up at the upper part of the valley slope. Plots are of the size 10x15 m. In each plot, all species of tree, shrub and herb layer were recorded and their abundances were estimated using 9-degree ordinal Braun-Blanquette scale (these values were consequently transformed into percentage values). At each plot, various topographical and soil factors were measured or estimated (see Table below). The dataset contains 27 transects with 97 samples.
 
-For the purpose of the current dataset, species in shrub and tree layer have been merged, juveniles removed and nomenclature have been modified according to Kubat et al. (2002).
+For the purpose of the current dataset, species in shrub and tree layer have been merged, juveniles removed and nomenclature have been modified according to Kubat et al. (2002). Dataset has two parts: with all (tree, shrub and herb) species (\code{vltava$spe, $ell, $env} etc.) and with subset of only herb species (\code{vltava$herbs$spe, $ell, $traits etc.}). While Ellenberg indicator values are provided for both all and only herb species subset, plant functional traits are only for subset of herb species (it would perhaps not be meaningful to compare e.g. SLA or plant height for trees and herbs).
 
 
 Environmental variables include:

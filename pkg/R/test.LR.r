@@ -8,7 +8,9 @@
 #' @param sqrt Logical value, default FALSE. Should the distance matrix based on Whittaker's index of association be square-rooted to become Euclidean? See Details.
 #' 
 #' @details
-#' Whittaker's index of association (calculated as Manhattan type distance on species profiles) is metric, but not Euclidean, and in PCoA (on which dbRDA is based) it can produced negative eigenvalues. After square root transformation, the index becomes both metric and Euclidean.
+#' Whittaker's index of association (calculated as Manhattan type distance on species profiles) is metric, but not Euclidean, and in PCoA (on which dbRDA is based) it can produce negative eigenvalues. After square root transformation, the index becomes both metric and Euclidean.
+#' 
+#' Variation explained by given environmental variable (R2) can differ between individual weighted means calculated from the same species composition matrix. This happens when different species attributes have different values missing; explained variation is calculated only from those columns (species) of compositional matrix L, which have assigned value for given species attribute. 
 #'
 #' @return
 #' List of lists, each node containing two parts: results of dbRDA analysis (calculated by \code{\link{capscale}} function from \code{vegan}) and results of Monte Carlo permutation test (calculated by \code{\link{anova.cca}} function, also from \code{vegan}). 
@@ -16,6 +18,7 @@
 #' @examples
 #' data (vltava)
 #' test.LR (M = wm (vltava$spe, vltava$ell), vltava$env, alpha = 0.05)
+#' test.LR (M = wm (vltava$spe, vltava$ell), vltava$env, type = 'moran')
 
 #' @export
 test.LR <- function (M, env, type = 'dbRDA', alpha = 0.001, sqrt = F)
@@ -36,10 +39,21 @@ test.LR.0 <- function (M, env, type = 'dbRDA', alpha = 0.001, sqrt = F)
   sitspe <- attr (M, 'sitspe')
   speatt <- attr (M, 'speatt')
   sitspe.temp <- sitspe[, !is.na (speatt)]
-  if (sqrt) pcoa.temp <- capscale (sqrt (ia (sitspe.temp)) ~ env) else pcoa.temp <- capscale (ia (sitspe.temp) ~ env)
-  anova.temp <- anova (pcoa.temp, alpha = alpha)
-  res <- list (pcoa = pcoa.temp, anova = anova.temp)
-  return (res)
+  if (type == 'dbRDA')
+  {
+    if (sqrt) pcoa.temp <- capscale (sqrt (ia (sitspe.temp)) ~ env) else pcoa.temp <- capscale (ia (sitspe.temp) ~ env)
+    anova.temp <- anova (pcoa.temp, alpha = alpha)
+    res <- list (type = 'dbRDA', pcoa = pcoa.temp, anova = anova.temp)
+  }
+  if (type == 'moran')
+  {
+    residuals <- resid (lm (M ~ as.matrix (env)))
+    ia.dist.inv <- as.matrix (1-ia (sitspe.temp))
+    #diag (ia.dist.inv) <- 0
+    moran <- ape:::Moran.I (residuals, weight = ia.dist.inv)
+    res <- list (type = 'moran', moran = moran)
+  }
+    return (res)
 }
 
 #' @rdname test.LR
@@ -49,8 +63,14 @@ print.testLR <- function (object, digits = 3)
   symnum.pval <- function (pval) symnum( pval, corr = FALSE, na = FALSE, cutpoints = c(0, 0.001, 0.01, 0.05, 0.1, 1), symbols = c("***", "**", "*", ".", " "))
   names.speatt <- names (object)
   names.env <- names (object[[1]])
-  res <- lapply (object, FUN = function (sp) lapply (sp, FUN = function (en) c(format (RsquareAdj (en$pcoa)$r.squared, digits = digits), symnum.pval (en$anova[,'Pr(>F)'][1]))))
-  res.m <- matrix (unlist (res), ncol = 2*length (names.env), nrow = length (names.speatt), dimnames = list (names.speatt, as.vector (rbind (names.env, ""))), byrow = T)
+  res <- lapply (object, FUN = function (sp) lapply (sp, FUN = function (en) 
+    {
+    if (en$type == 'dbRDA') res.temp <- c(format (RsquareAdj (en$pcoa)$r.squared, digits = digits), format (en$anova[,'Pr(>F)'][1], digits = digits), symnum.pval (en$anova[,'Pr(>F)'][1]))
+    if (en$type == 'moran') res.temp <- c(format (en$moran$observed, digits = digits), format (en$moran$p.value, digits = 3), symnum.pval (en$moran$p.value))
+    return (res.temp)
+    }))
+  
+  res.m <- matrix (unlist (res), ncol = 3*length (names.env), nrow = length (names.speatt), dimnames = list (names.speatt, as.vector (rbind (names.env, "P", ""))), byrow = T)
   cat ('\nTable of variation in species composition, which is used to calculate individual weighted means of species attributes (in rows), explained by explanatory variables (in columns). Explained variation is expressed as R2 (not adjusted).\n\n')
   print.default (res.m, quote = F, right = T)
 }
@@ -58,3 +78,4 @@ print.testLR <- function (object, digits = 3)
 #' @rdname test.LR
 summary.testLR <- function (object)
   print.default (object)
+

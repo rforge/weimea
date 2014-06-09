@@ -29,7 +29,9 @@ List of lists, each node containing two parts: results of dbRDA analysis (calcul
 The function testing the link between sample attributes and species composition of the matrix, from which weighted means are calculated. The test is based on db-RDA (distance-based redundancy analysis), and is using matrix of intersample distances calculated using Whittaker's index of association (\code{\link{ia}}). Significance of the variation explained by sample attributes (R2) is tested by Monte Carlo permutation test. Significant relationship is considered as an argument to use modified permutation test instead of the standard permutation test for testing the relationship between weighted mean of species attributes and sample attributes.
 }
 \details{
-Whittaker's index of association (calculated as Manhattan type distance on species profiles) is metric, but not Euclidean, and in PCoA (on which dbRDA is based) it can produced negative eigenvalues. After square root transformation, the index becomes both metric and Euclidean.
+Whittaker's index of association (calculated as Manhattan type distance on species profiles) is metric, but not Euclidean, and in PCoA (on which dbRDA is based) it can produce negative eigenvalues. After square root transformation, the index becomes both metric and Euclidean.
+
+Variation explained by given environmental variable (R2) can differ between individual weighted means calculated from the same species composition matrix. This happens when different species attributes have different values missing; explained variation is calculated only from those columns (species) of compositional matrix L, which have assigned value for given species attribute.
 }
 \examples{
 data (vltava)

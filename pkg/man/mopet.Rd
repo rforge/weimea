@@ -18,7 +18,7 @@ mopet(M, env, method = c("lm"), cor.coef = c("pearson"),
 
 \item{env}{Vector or matrix with variables. See details.}
 
-\item{method}{Statistical method used to analyse the relationship between M (of class \code{wm} and env), partial match to \code{'lm'}, \code{'aov'}, \code{'cor'} and \code{'kruskal'}.}
+\item{method}{Statistical method used to analyse the relationship between M (of class \code{wm} and env), partial match to \code{'lm'}, \code{'aov'}, \code{'cor'}, \code{'kruskal'} and \code{'slope'}.}
 
 \item{cor.coef}{Correlation coefficient in case of \code{method = 'cor'}. Partial match to 'pearson', 'spearman' and 'kendal'.}
 
@@ -50,7 +50,10 @@ Currently implemented statistical methods are correlation (\code{'cor'}), linear
 
 Argument \code{env} can be vector or matrix with one column. Only in case of linear regression (\code{method = 'lm'}) is possible to use matrix with several variables, which will be all used as independent variables in the model. For ANOVA and Kruskal-Wallis test, make sure that 'env' is \code{factor} (warning will be returned if this is not the case, but the calculation will be conducted).
 
-Difference between 'lm' and 'aov' is in the format of summary tables, returned by \code{summary.mopet} function. In case of 'aov', this summary is expressed in the traditional language of ANOVA rather than linear models.
+Difference between \code{method = 'lm'} and \code{'aov'} is in the format of summary tables, returned by \code{summary.mopet} function. In case of 'aov', this summary is expressed in the traditional language of ANOVA rather than linear models.
+
+Both \code{method = 'lm'} and \code{'slope'} are based on linear regression and calculated by function \code{\link{lm}}, but differ by test statistic: while 'lm' is using F value and is testing the strength of the regression (measured by r2), 'slope' is using the slope of the regression line (b). This statistic is added here for comparison with the fourth corner method. While r2 (and r) is influenced by the issue of compositional autocorrelation, slope of regression is not.
+
 Specific issue related to weighted mean is the case of missing species attributes. In current implementation, species with missing species attributes are removed from sample x species matrix prior to permutation of species attributes among species.
 }
 \examples{
@@ -58,7 +61,7 @@ data (vltava)
 mean.eiv <- wm (vltava$spe, vltava$ell)
 mopet (mean.eiv, vltava$env$pH.H, perm = 49, test = 'both')
 mopet (mean.eiv, vltava$env$pH.H, perm = 49, test = 'stand', method = 'cor', cor.coef = 'spearm')
-summary (mopet (mean.eiv, vltava$env$GROUP, perm = 49, method = 'krusk'))
+summary (mopet (mean.eiv, vltava$group, perm = 49, method = 'krusk'))
 }
 \seealso{
 \code{\link{wm}}

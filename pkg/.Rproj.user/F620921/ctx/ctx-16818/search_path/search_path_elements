@@ -1,0 +1,16 @@
+.GlobalEnv
+package:vegan
+package:lattice
+package:permute
+package:ade4
+package:weimea
+package:roxygen2
+tools:rstudio
+package:stats
+package:graphics
+package:grDevices
+package:utils
+package:datasets
+package:methods
+Autoloads
+package:base

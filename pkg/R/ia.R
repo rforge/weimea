@@ -1,6 +1,6 @@
 #' Whittaker's index of association
 #' 
-#' Creates distance matrix based on Whittaker's index of association, which is reflects the distances between weighted means of species attributes calculated for individual samples. The metric is baselly Manhattan-type distance calculated on species profiles (i.e. on community matrix in which individual rows are standardized to row-totals).
+#' Creates distance matrix based on Whittaker's index of association, which reflects the dissimilarities between weighted means of species attributes calculated for individual samples, which can be attributed to differences in species composition. The metric is Manhattan-type distance calculated on species profiles (i.e. on community matrix with rows standardized to row-totals).
 #' @param sitspe Compositional matrix (samples x species).
 #' @author David Zeleny (zeleny.david@@gmail.com)
 #' @references

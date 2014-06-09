@@ -18,8 +18,8 @@
 #' The definition of scenarios is as follows:
 #' \describe{
 #' \item{\code{scenario = 1}}{All three matrices (\bold{R}, \bold{L} and \bold{Q}) are linked together by the mechanism of simulation model described above.}
-#' \item{\code{scenario = 2}}{Species composition (\bold{L}) is linked to sample attributes (\bold{R}), but not to species attributes (\bold{Q}). Matrices are created as in scenario 1, and afterwards the rows in matrix \bold{R} are permuted (cancelling the link between \bold{L} and \bold{R}).}
-#' \item{\code{scenario = 3}}{Species composition (\bold{L}) is linked to species attributes (\bold{Q}), but not to sample attributes (\bold{R}). Matrices are created as in scenario 1, and afterwards rows with species values in matrix \bold{Q} are permuted (this cancels link between \bold{L} and \bold{Q}).}
+#' \item{\code{scenario = 2}}{Species composition (\bold{L}) is linked to sample attributes (\bold{R}), but not to species attributes (\bold{Q}). Matrices are created as in scenario 1, and afterwards the rows with species values in matrix \bold{Q} are permuted (cancelling the link between \bold{L} and \bold{Q}).}
+#' \item{\code{scenario = 3}}{Species composition (\bold{L}) is linked to species attributes (\bold{Q}), but not to sample attributes (\bold{R}). Matrices are created as in scenario 1, and afterwards rows in matrix \bold{R} are permuted (this cancels link between \bold{L} and \bold{R}).}
 #' \item{\code{scenario = 4}}{There is no link between \bold{L} and \bold{Q}, neither between \bold{L} and \bold{R}. Matrices are created as in scenario 1, and afterwards the rows in both matrices \bold{R} and \bold{Q} are permuted, cancelling all links between matrices.}
 #' \item{\code{scenario = 0}}{This scenario represents the continuous transition between all above scenarios (1 to 4). Modifiying the proportion of noise in species attributes (argument \code{prop.noise.specatt}) and in sample attributes (argument \code{prop.noise.sampatt}) enables to create intermediary scenarios with varying degree to which the matrices are connected to each other. The following settings of arguments is analogous to the scenarios mentioned above:
 #' \itemize{
@@ -75,14 +75,6 @@ simul.RLQ <- function (n = 100, p = 100, mi.tol = 10, scenario = 1, add.noise = 
   for (j in seq (1, p))
     y[,j] <- h[j]*exp (-(x - mi[j])^2/(2*((sigma[j])^2)))
   
-  if (add.noise)
-  {
-    y.n <- apply (y, 2, FUN = function (x) x + rnorm (n = length (x), mean = 0, sd = .2))  # D&L added set up sd to 2, not .2
-    y.n[y.n < 0] <- 0
-    x.n <- x + rnorm (length (x), mean = 5, sd = 2)
-    mi.n <- mi + rnorm (length (mi), mean = 5, sd = 2)
-  }
-  
   if (pa) y <- apply (y, 2, FUN = function (x) rbinom (length (x), 1, prob = x)) 
   
   if (scenario == 2 | scenario == 4) mi <- sample (mi)
@@ -94,7 +86,15 @@ simul.RLQ <- function (n = 100, p = 100, mi.tol = 10, scenario = 1, add.noise = 
     mi <- noise.var (mi, prop.noise.traits)
     x <- noise.var (x, prop.noise.env)
   }
-  
+
+  if (add.noise)
+  {
+    y.n <- apply (y, 2, FUN = function (x) x + rnorm (n = length (x), mean = 0, sd = .2))  # D&L added set up sd to 2, not .2
+    y.n[y.n < 0] <- 0
+    x.n <- x + rnorm (length (x), mean = 5, sd = 2)
+    mi.n <- mi + rnorm (length (mi), mean = 5, sd = 2)
+  }
+    
   if (add.noise) res <- list (sitspe = as.data.frame (y.n), env = as.data.frame (x.n), speatt = as.data.frame (mi.n)) else res <- list (sitspe = as.data.frame (y), env = as.data.frame (x), speatt = as.data.frame (mi))
   return (res)
 }

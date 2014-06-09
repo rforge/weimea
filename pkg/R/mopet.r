@@ -5,7 +5,7 @@
 #' @name mopet
 #' @param M An object of the class \code{wm} 
 #' @param env Vector or matrix with variables. See details.
-#' @param method Statistical method used to analyse the relationship between M (of class \code{wm} and env), partial match to \code{'lm'}, \code{'aov'}, \code{'cor'} and \code{'kruskal'}.
+#' @param method Statistical method used to analyse the relationship between M (of class \code{wm} and env), partial match to \code{'lm'}, \code{'aov'}, \code{'cor'}, \code{'kruskal'} and \code{'slope'}.
 #' @param cor.coef Correlation coefficient in case of \code{method = 'cor'}. Partial match to 'pearson', 'spearman' and 'kendal'.
 #' @param dependence Should M be dependent variable and env independent (\code{'M ~ env'}), or opposite? Applicable only for \code{method = 'lm'}. Partial match to \code{'M ~ env'} and \code{'env ~ M'}, so to write \code{dep = 'M'} is enough.
 #' @param permutations Number of permutations.
@@ -24,7 +24,10 @@
 #'
 #' Argument \code{env} can be vector or matrix with one column. Only in case of linear regression (\code{method = 'lm'}) is possible to use matrix with several variables, which will be all used as independent variables in the model. For ANOVA and Kruskal-Wallis test, make sure that 'env' is \code{factor} (warning will be returned if this is not the case, but the calculation will be conducted). 
 #' 
-#' Difference between 'lm' and 'aov' is in the format of summary tables, returned by \code{summary.mopet} function. In case of 'aov', this summary is expressed in the traditional language of ANOVA rather than linear models.
+#' Difference between \code{method = 'lm'} and \code{'aov'} is in the format of summary tables, returned by \code{summary.mopet} function. In case of 'aov', this summary is expressed in the traditional language of ANOVA rather than linear models.
+#' 
+#' Both \code{method = 'lm'} and \code{'slope'} are based on linear regression and calculated by function \code{\link{lm}}, but differ by test statistic: while 'lm' is using F value and is testing the strength of the regression (measured by r2), 'slope' is using the slope of the regression line (b). This statistic is added here for comparison with the fourth corner method. While r2 (and r) is influenced by the issue of compositional autocorrelation, slope of regression is not.
+#' 
 #' Specific issue related to weighted mean is the case of missing species attributes. In current implementation, species with missing species attributes are removed from sample x species matrix prior to permutation of species attributes among species. 
 #' @return  Function \code{mopet} returns list of the class \code{"mopet"}, which contains the following items:
 #' \itemize{
@@ -41,7 +44,7 @@
 #' @export
 mopet <- function (M, env, method = c('lm'), cor.coef = c('pearson'), dependence = "M ~ env", permutations = 499, test = "modified", parallel = NULL)
 {
-    METHOD <- c('lm', 'aov', 'cor', 'kruskal')
+    METHOD <- c('lm', 'aov', 'cor', 'kruskal', 'slope')
     COR.COEF <- c('pearson', 'spearman', 'kendall')
     TEST <- c('standard', 'modified', 'both')
     DEPENDENCE <- c("M ~ env", "env ~ M")
@@ -55,36 +58,43 @@ mopet <- function (M, env, method = c('lm'), cor.coef = c('pearson'), dependence
     sweeping.sign <- if (method == 'cor' & cor.coef == 'spearman') "<=" else ">="
     perm.P <- NULL
     modif.P <- NULL
+    sitspe = attr (M, 'sitspe')
     fun <-  switch (method, 
               lm = if (dependence == 'M ~ env') expression (lm (M ~ env)) else expression (lm (env ~ M)),
               aov = expression (aov (M ~ env)),
               cor = expression (cor.test (M, env, method = cor.coef)),
-              kruskal = expression (kruskal.test (M, env)))
+              kruskal = expression (kruskal.test (M, env)),
+              slope = expression (lm (M ~ env, weights = rowSums (sitspe))))
     summ <- switch (method,
                     lm = expression (summary (obj)),
                     aov = expression (summary (obj)),
                     cor = expression (obj), 
-                    kruskal = expression (obj))
+                    kruskal = expression (obj),
+                    slope = expression (summary (obj)))
     coefs <- switch (method, 
                     lm = expression (coef (obj)),
                     aov = expression (coef (obj)),
                     cor = expression (obj$estimate),
-                    kruskal = expression (obj$parameter))
+                    kruskal = expression (obj$parameter),
+                    slope = expression (coef (obj)))
     stat <- switch (method,
                     lm = expression ({temp <- anova (obj)$"F value"[1]; names (temp) <- "F value"; temp}),
                     aov = expression ({temp <- summary (obj)[[1]]$"F value"[1]; names (temp) <- "F value"; temp}),
                     cor = expression (obj$statistic),
-                    kruskal = expression (obj$statistic))
+                    kruskal = expression (obj$statistic),
+                    slope = expression ({temp <- coef (summary (obj))[2,1]; names (temp) <- "b"; temp}))
     signi <- switch (method,
                     lm = expression (anova (obj)$"Pr(>F)"[1]),
                     aov = expression (summary (obj)[[1]]$"Pr(>F)"[1]),
                     cor = expression (obj$p.value),
-                    kruskal = expression (obj$p.value))
+                    kruskal = expression (obj$p.value),
+                    slope = expression (coef (summary (obj))[2,4]))
     tail <- switch (method,
                      lm = 'one',
                      aov = 'one',
                      cor = 'two',
-                     kruskal = 'one')
+                     kruskal = 'one',
+                     slope = 'two')
     res.real.fun <- if (dependence == 'M ~ env') apply (as.matrix (M), 2, FUN = function (i) with (list (M = i, env = env), eval (fun))) else apply (as.matrix (env), 2, FUN = function (i) with (list (env = i, M = as.matrix (M)), eval (fun)))
     real.summaries <- lapply (res.real.fun, FUN = function (obj) with (obj, eval (summ)))
     coefs <- lapply (res.real.fun, FUN = function (obj) with (obj, eval (coefs)))
