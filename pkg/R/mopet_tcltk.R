@@ -1,4 +1,4 @@
-
+#' @export
 simple.data.check <- function (calc.analysis,  sp.data)
 {
   if (calc.analysis == "ANOVA") if (!all (rownames (groups) == rownames (veg))) if (tclvalue (tkmessageBox (type = "yesno", message = "Rownames of Vegetation matrix and Groups of samples have different names. Proceed anyway?")) == "no") break
@@ -344,7 +344,7 @@ calc.cor <- function (permutations, species.data)
   }
 }
 
-
+#' @export
 mopet_tcltk <- function ()
 {
 require (tcltk)

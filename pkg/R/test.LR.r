@@ -1,6 +1,6 @@
 #' Test of the link between sample attributes and matrix of species composition (i.e. whether \bold{L} is linked to \bold{R})
 #' 
-#' The function testing the link between sample attributes and species composition of the matrix, from which weighted means are calculated. The test is based on db-RDA (distance-based redundancy analysis), and is using matrix of intersample distances calculated using Whittaker's index of association (\code{\link{ia}}). Significance of the variation explained by sample attributes (R2) is tested by Monte Carlo permutation test. Significant relationship is considered as an argument to use modified permutation test instead of the standard permutation test for testing the relationship between weighted mean of species attributes and sample attributes.
+#' The function testing the link between sample attributes and species composition of the matrix, from which weighted means are calculated. The test is based either on db-RDA (distance-based redundancy analysis), or Moran's I. Significant relationship is considered as an argument to use modified permutation test instead of the standard permutation test for testing the relationship between weighted mean of species attributes and sample attributes.
 #' @param M Object of the 'wm' class. Matrix with weighted means of species attributes.
 #' @param env Matrix with environmental variables.
 #' @param type Currently not implemented. In the future, other types of the test (apart to the one based on db-RDA) should be available.
@@ -8,6 +8,8 @@
 #' @param sqrt Logical value, default FALSE. Should the distance matrix based on Whittaker's index of association be square-rooted to become Euclidean? See Details.
 #' 
 #' @details
+#' In case of dbRDA, the matrix of intersample distances is calculated using Whittaker's index of association (\code{\link{ia}}) and significance of the variation explained by sample attributes (R2) is tested by Monte Carlo permutation test. In case of Moran's I, the test is examining wheather the sample attributes variable is compositionally autocorrelated, i.e. whether the Moran's I calculated on this variable using as weighted inverted dissimilarities between sample's species composition is significant.
+#' 
 #' Whittaker's index of association (calculated as Manhattan type distance on species profiles) is metric, but not Euclidean, and in PCoA (on which dbRDA is based) it can produce negative eigenvalues. After square root transformation, the index becomes both metric and Euclidean.
 #' 
 #' Variation explained by given environmental variable (R2) can differ between individual weighted means calculated from the same species composition matrix. This happens when different species attributes have different values missing; explained variation is calculated only from those columns (species) of compositional matrix L, which have assigned value for given species attribute. 
@@ -47,10 +49,10 @@ test.LR.0 <- function (M, env, type = 'dbRDA', alpha = 0.001, sqrt = F)
   }
   if (type == 'moran')
   {
-    residuals <- resid (lm (M ~ as.matrix (env)))
+    #residuals <- resid (lm (M ~ as.matrix (env)))
     ia.dist.inv <- as.matrix (1-ia (sitspe.temp))
     #diag (ia.dist.inv) <- 0
-    moran <- ape:::Moran.I (residuals, weight = ia.dist.inv)
+    moran <- ape:::Moran.I (env, weight = ia.dist.inv)
     res <- list (type = 'moran', moran = moran)
   }
     return (res)
@@ -76,6 +78,22 @@ print.testLR <- function (object, digits = 3)
 }
 
 #' @rdname test.LR
+#' @export
 summary.testLR <- function (object)
   print.default (object)
 
+#' @rdname test.LR
+#' @export
+coef.testLR <- function (object)
+{
+  names.speatt <- names (object)
+  names.env <- names (object[[1]])
+  res <- lapply (object, FUN = function (sp) lapply (sp, FUN = function (en) 
+  {
+    if (en$type == 'dbRDA') res.temp <- c(RsquareAdj (en$pcoa)$r.squared, en$anova[,'Pr(>F)'][1])
+    if (en$type == 'moran') res.temp <- c(en$moran$observed, en$moran$p.value)
+    return (res.temp)
+  }))
+  res.m <- matrix (unlist (res), ncol = 2*length (names.env), nrow = length (names.speatt), dimnames = list (names.speatt, as.vector (rbind (names.env, "P values"))), byrow = T)
+  return (res.m)
+}
