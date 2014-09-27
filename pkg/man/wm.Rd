@@ -49,11 +49,7 @@ Function \code{[.wm]} is for extracting specified rows and columns from matrix o
 data (vltava)
 mean.eiv <- wm (sitspe = vltava$spe, speatt = vltava$ell)
 
-# Calculation of community weighted mean of species functional traits using dataset aravo from ade4 library
-data (aravo, package = 'ade4')
-cwm <- wm (sitspe = aravo$spe, speatt = aravo$traits)
-
-summary (cwm) # brief summary
+summary (mean.eiv)
 
 # Extracting values from the object of \\code{wm} class
 cwm[,1]
