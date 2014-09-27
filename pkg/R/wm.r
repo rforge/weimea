@@ -19,8 +19,8 @@
 #' summary (mean.eiv)
 #' 
 #' # Extracting values from the object of \code{wm} class
-#' cwm[,1]
-#' cwm[1:10, 2:3]
+#' mean.eiv[,1]
+#' mean.eiv[1:10, 2:3]
 #' @author David Zeleny (zeleny.david@@gmail.com)
 #' @export
 #' 
