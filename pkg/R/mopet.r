@@ -18,8 +18,8 @@
 #' @examples 
 #' data (vltava)
 #' mean.eiv <- wm (vltava$spe, vltava$ell)
-#' mopet (mean.eiv, vltava$env$pH.H, perm = 49, test = 'both')
-#' mopet (mean.eiv, vltava$env$pH.H, perm = 49, test = 'stand', method = 'cor', cor.coef = 'spearm')
+#' mopet (mean.eiv, vltava$env$pH, perm = 49, test = 'both')
+#' mopet (mean.eiv, vltava$env$pH, perm = 49, test = 'stand', method = 'cor', cor.coef = 'spearm')
 #' summary (mopet (mean.eiv, vltava$group, perm = 49, method = 'krusk'))
 #' @details
 #' Currently implemented statistical methods are correlation (\code{'cor'}), linear regression (\code{method = 'lm'}), ANOVA (\code{'aov'}) and Kruskal-Wallis test (\code{'kruskal'}).

@@ -32,7 +32,7 @@
 #' 
 #' 
 #' @return
-#' List of three items:
+#' The function returns the list of three items:
 #' \tabular{lll}{
 #' \tab \code{sitspe} \tab Matrix with species composition data.\cr
 #' \tab \code{env}    \tab Matrix with sample attributes (environmnetal data).\cr
