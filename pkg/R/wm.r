@@ -5,7 +5,7 @@
 #' @param sitspe Matrix or data.frame with community data matrix (sites x species)
 #' @param speatt Vector, matrix or data.frame with species attributes (species x attributes)
 #' @param object any R object
-#' @param M Object of the class \code{wm}
+#' @param M,x Object of the class \code{wm}
 #' @param drop  In function \code{[.wm]} if \code{TRUE} coerces the result to the lowest possible dimension (i.e. vector if matrix has only one column). Currently not implemented, change into \code{TRUE} will have no effect.
 #' @param i,j Subscripts of the matrix of the class "Wm" (rows and columns).
 #' @details
@@ -23,12 +23,11 @@
 #' mean.eiv[1:10, 2:3]
 #' @author David Zeleny (zeleny.david@@gmail.com)
 #' @export
-#' 
 wm <- function (sitspe, speatt)
 {
   sitspe <- as.matrix (sitspe)
   speatt <- as.matrix (speatt)
-  wm.temp <- apply (speatt, 2, FUN = function (x) vegan:::decostand (sitspe[,!is.na (x)], 'total') %*% x[!is.na(x)])
+  wm.temp <- apply (speatt, 2, FUN = function (x) vegan::decostand (sitspe[,!is.na (x)], 'total') %*% x[!is.na(x)])
   attr (wm.temp, 'sitspe') <- sitspe
   attr (wm.temp, 'speatt') <- speatt
   attr(wm.temp, 'class') <- c('wm')
@@ -62,13 +61,13 @@ is.wm <- function (object)
 
 #' @rdname wm
 #' @export
-as.matrix.wm <- function (M)
+as.matrix.wm <- function (x)
 {
-  attr (M, 'sitspe') <- NULL
-  attr (M, 'speatt') <- NULL
-  M <- unclass (M)
-  M <- as.matrix (M)
-  return (M)
+  attr (x, 'sitspe') <- NULL
+  attr (x, 'speatt') <- NULL
+  x <- unclass (x)
+  x <- as.matrix (x)
+  return (x)
 }
 
 #' @rdname wm

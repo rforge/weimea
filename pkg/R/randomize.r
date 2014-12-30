@@ -1,7 +1,7 @@
-#' Weighted mean calculated from randomized species attributes
+#' Weighted mean calculated from randoxized species attributes
 #' 
 #' Function applied on the object of class \code{wm}, which returns values of weighted mean calculated from randomized species attributes.
-#' @param M,x object of the class \code{wm}
+#' @param x object of the class \code{wm}
 #' @param permutations number of randomizations
 #' @param FUN function to be applied on the column of calculated weighted mean values
 #' @param progress.bar logical value, should be the progress bar indicating the progress of the calculation launched?
@@ -10,19 +10,16 @@
 #' @param export.cl ??
 #' @param ... parameters passed to other functions.
 #' @author David Zeleny (zeleny.david@@gmail.com)
-#' @export
-#' 
 
 randomize <- function (x, ...) UseMethod ('randomize')
-
 #' @export
 #' @rdname randomize
-randomize.wm <- function (M, permutations = 1, FUN = function (x) x, progress.bar = F, parallel = NULL, library.par = NULL, export.cl = NULL)
+randomize.wm <- function (x, permutations = 1, FUN = function (y) y, progress.bar = F, parallel = NULL, library.par = NULL, export.cl = NULL)
 {
-  if (!is.wm (M)) stop ("Object M is not of class 'wm'")
+  if (!is.wm (x)) stop ("Object x is not of class 'wm'")
   if (progress.bar & is.null (parallel)) win.pb <- winProgressBar(title = "Permutation progress bar", label = "", min = 0, max = permutations, initial = 0, width = 300)
-  sitspe <- attr (M, 'sitspe')
-  speatt <- attr (M, 'speatt')
+  sitspe <- attr (x, 'sitspe')
+  speatt <- attr (x, 'speatt')
   FUN1 <- function (x) wm (sitspe = sitspe[,!is.na(x)], speatt = sample (x[!is.na(x)]))
   if (is.null (parallel))
   {
@@ -36,16 +33,16 @@ randomize.wm <- function (M, permutations = 1, FUN = function (x) x, progress.ba
   
   if (!is.null (parallel))
   {
-    require (parallel)
-    cl <- makeCluster(parallel)
-    clusterExport (cl, varlist = c("FUN", "FUN1", "speatt", "sitspe", "library.par"), envir = environment ())
-    if (!is.null (export.cl)) clusterExport (cl, export.cl)
-    if (!is.null (library.par)) clusterEvalQ (cl, eval (call ('library', library.par)))
-    temp.result <- parLapply (cl, seq (1, permutations), fun = function (x)
+    #require (parallel)
+    cl <- parallel::makeCluster(parallel)
+    parallel::clusterExport (cl, varlist = c("FUN", "FUN1", "speatt", "sitspe", "library.par"), envir = environment ())
+    if (!is.null (export.cl)) parallel::clusterExport (cl, export.cl)
+    if (!is.null (library.par)) parallel::clusterEvalQ (cl, eval (call ('library', library.par)))
+    temp.result <- parallel::parLapply (cl, seq (1, permutations), fun = function (x)
     {
       apply (apply (speatt, 2, FUN = FUN1), 2, FUN)
     })
-    stopCluster (cl)
+    parallel::stopCluster (cl)
   }
   if (progress.bar & is.null (parallel)) close (win.pb)
   if (permutations == 1) temp.result <- temp.result[[1]]

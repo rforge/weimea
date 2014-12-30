@@ -4,7 +4,7 @@
 #' @param recalculate should the mean values in \code{object} be recalculated?
 #' @export
 
-range.wm <- function (object, max = 9, recalculate = T)
+rangeWM <- function (object, max = 9, recalculate = T)
 {
   if (!is.wm (object)) stop ("object is not of the class 'wm'")
   speatt <- attr (object, 'speatt')

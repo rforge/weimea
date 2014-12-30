@@ -6,4 +6,4 @@
 #' @references
 #' Legendre P. & Legendre L. 2012. Numerical Ecology. 3rd edn. Elsevier, Oxford, UK. 
 #' @export
-ia <- function (sitspe) vegdist (decostand (sitspe, 'total'), 'manhattan')/2
+ia <- function (sitspe) vegan::vegdist (vegan::decostand (sitspe, 'total'), 'manhattan')/2

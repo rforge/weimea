@@ -6,7 +6,7 @@
 #' @param type Currently not implemented. In the future, other types of the test (apart to the one based on db-RDA) should be available.
 #' @param alpha Target Type I error rate for Monte Carlo permutation tests (influences number of permutations).
 #' @param sqrt Logical value, default FALSE. Should the distance matrix based on Whittaker's index of association be square-rooted to become Euclidean? See Details.
-#' @param object Object of the class "testLR"
+#' @param x Object of the class "testLR"
 #' @param digits Number of digits reported for parameters in summary output.
 #' 
 #' @details
@@ -45,7 +45,7 @@ test.LR.0 <- function (M, env, type = 'dbRDA', alpha = 0.001, sqrt = F)
   sitspe.temp <- sitspe[, !is.na (speatt)]
   if (type == 'dbRDA')
   {
-    if (sqrt) pcoa.temp <- capscale (sqrt (ia (sitspe.temp)) ~ env) else pcoa.temp <- capscale (ia (sitspe.temp) ~ env)
+    if (sqrt) pcoa.temp <- vegan::capscale (sqrt (ia (sitspe.temp)) ~ env) else pcoa.temp <- vegan::capscale (ia (sitspe.temp) ~ env)
     anova.temp <- anova (pcoa.temp, alpha = alpha)
     res <- list (type = 'dbRDA', pcoa = pcoa.temp, anova = anova.temp)
   }
@@ -62,14 +62,14 @@ test.LR.0 <- function (M, env, type = 'dbRDA', alpha = 0.001, sqrt = F)
 
 #' @rdname test.LR
 #' @export
-print.testLR <- function (object, digits = 3)
+print.testLR <- function (x, digits = 3)
 {
   symnum.pval <- function (pval) symnum( pval, corr = FALSE, na = FALSE, cutpoints = c(0, 0.001, 0.01, 0.05, 0.1, 1), symbols = c("***", "**", "*", ".", " "))
-  names.speatt <- names (object)
-  names.env <- names (object[[1]])
-  res <- lapply (object, FUN = function (sp) lapply (sp, FUN = function (en) 
+  names.speatt <- names (x)
+  names.env <- names (x[[1]])
+  res <- lapply (x, FUN = function (sp) lapply (sp, FUN = function (en) 
     {
-    if (en$type == 'dbRDA') res.temp <- c(format (RsquareAdj (en$pcoa)$r.squared, digits = digits), format (en$anova[,'Pr(>F)'][1], digits = digits), symnum.pval (en$anova[,'Pr(>F)'][1]))
+    if (en$type == 'dbRDA') res.temp <- c(format (vegan::RsquareAdj (en$pcoa)$r.squared, digits = digits), format (en$anova[,'Pr(>F)'][1], digits = digits), symnum.pval (en$anova[,'Pr(>F)'][1]))
     if (en$type == 'moran') res.temp <- c(format (en$moran$observed, digits = digits), format (en$moran$p.value, digits = 3), symnum.pval (en$moran$p.value))
     return (res.temp)
     }))
@@ -81,18 +81,18 @@ print.testLR <- function (object, digits = 3)
 
 #' @rdname test.LR
 #' @export
-summary.testLR <- function (object)
-  print.default (object)
+summary.testLR <- function (x)
+  print.default (x)
 
 #' @rdname test.LR
 #' @export
-coef.testLR <- function (object)
+coef.testLR <- function (x)
 {
-  names.speatt <- names (object)
-  names.env <- names (object[[1]])
-  res <- lapply (object, FUN = function (sp) lapply (sp, FUN = function (en) 
+  names.speatt <- names (x)
+  names.env <- names (x[[1]])
+  res <- lapply (x, FUN = function (sp) lapply (sp, FUN = function (en) 
   {
-    if (en$type == 'dbRDA') res.temp <- c(RsquareAdj (en$pcoa)$r.squared, en$anova[,'Pr(>F)'][1])
+    if (en$type == 'dbRDA') res.temp <- c(vegan::RsquareAdj (en$pcoa)$r.squared, en$anova[,'Pr(>F)'][1])
     if (en$type == 'moran') res.temp <- c(en$moran$observed, en$moran$p.value)
     return (res.temp)
   }))
