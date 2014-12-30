@@ -10,6 +10,6 @@ rangeWM <- function (object, max = 9, recalculate = T)
   speatt <- attr (object, 'speatt')
   res <- ceiling((speatt - min (speatt))/(diff (range (speatt))/max))
   res[res == 0] <- 1
-  if (recalculate) object <- as.wm (speatt = res, sitspe = attr (object, 'sitspe')) else attr (object, 'speatt') <- res
+  if (recalculate) object <- wm (speatt = res, sitspe = attr (object, 'sitspe')) else attr (object, 'speatt') <- res
   object
 }

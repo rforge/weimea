@@ -13,31 +13,31 @@ wm(sitspe, speatt)
 
 is.wm(object)
 
-\method{[}{wm}(M, i, j, drop = F)
+\method{[}{wm}(object, i, j, drop = F)
 
-\method{as.matrix}{wm}(x)
+\method{as.matrix}{wm}(x, ...)
 
-\method{summary}{wm}(M, long = F)
+\method{summary}{wm}(object, long = F, ...)
 
-\method{print}{wm}(M)
+\method{print}{wm}(x, ...)
 }
 \arguments{
 \item{sitspe}{Matrix or data.frame with community data matrix (sites x species)}
 
 \item{speatt}{Vector, matrix or data.frame with species attributes (species x attributes)}
 
-\item{object}{any R object}
-
-\item{M,x}{Object of the class \code{wm}}
+\item{object,x}{Object of the class \code{wm}}
 
 \item{i,j}{Subscripts of the matrix of the class "Wm" (rows and columns).}
 
 \item{drop}{In function \code{[.wm]} if \code{TRUE} coerces the result to the lowest possible dimension (i.e. vector if matrix has only one column). Currently not implemented, change into \code{TRUE} will have no effect.}
 
+\item{...}{Other arguments passed into \code{as.matrix}, \code{summary} or \code{print} function. Currently not supported.}
+
 \item{long}{should summary return long output? (TRUE vs FALSE)}
 }
 \value{
-Object of class \code{\link{wm}}, which contains the matrix of calculated weighted means of species attributes for each sample (sample x weighted mean) and two attributes: \code{sitspe} species x sample matrix from which the weighted mean was calculated, and \code{speatt} species x attributes matrix with species attributes. All weighted means of species attributes must be based on the same species x sample matrix with the same number of samples.
+Object of class \code{"wm"}, which has \code{print}, \code{summary}, \code{as.matrix} and \code{'[.'} methods. Object of \code{"wm"} class contains the matrix of calculated weighted means of species attributes for each sample (sample x weighted mean) and two attributes: \code{sitspe} species x sample matrix from which the weighted mean was calculated, and \code{speatt} species x attributes matrix with species attributes. All weighted means of species attributes must be based on the same species x sample matrix with the same number of samples.
 }
 \description{
 Function \code{wm} calculates weighted mean of species attributes, using matrices of species composition and species attributes. Other functions are for handling the objects of class \code{wm}.

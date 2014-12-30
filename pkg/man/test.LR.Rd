@@ -9,11 +9,11 @@
 \usage{
 test.LR(M, env, type = "dbRDA", alpha = 0.001, sqrt = F)
 
-\method{print}{testLR}(x, digits = 3)
+\method{print}{testLR}(x, digits = 3, ...)
 
-\method{summary}{testLR}(x)
+\method{summary}{testLR}(object, ...)
 
-\method{coef}{testLR}(x)
+\method{coef}{testLR}(object, ...)
 }
 \arguments{
 \item{M}{Object of the 'wm' class. Matrix with weighted means of species attributes.}
@@ -26,9 +26,11 @@ test.LR(M, env, type = "dbRDA", alpha = 0.001, sqrt = F)
 
 \item{sqrt}{Logical value, default FALSE. Should the distance matrix based on Whittaker's index of association be square-rooted to become Euclidean? See Details.}
 
-\item{x}{Object of the class "testLR"}
+\item{x,object}{Object of the class "testLR"}
 
 \item{digits}{Number of digits reported for parameters in summary output.}
+
+\item{...}{Other arguments passed into \code{print}, \code{summary} and \code{coef} functions. Currently not supported.}
 }
 \value{
 Object of the class "testLR", list of lists, each node containing two parts: results of dbRDA analysis (calculated by \code{\link{capscale}} function from \code{vegan}) and results of Monte Carlo permutation test (calculated by \code{\link{anova.cca}} function, also from \code{vegan}).

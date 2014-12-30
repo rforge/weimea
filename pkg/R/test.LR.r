@@ -6,8 +6,9 @@
 #' @param type Currently not implemented. In the future, other types of the test (apart to the one based on db-RDA) should be available.
 #' @param alpha Target Type I error rate for Monte Carlo permutation tests (influences number of permutations).
 #' @param sqrt Logical value, default FALSE. Should the distance matrix based on Whittaker's index of association be square-rooted to become Euclidean? See Details.
-#' @param x Object of the class "testLR"
+#' @param x,object Object of the class "testLR"
 #' @param digits Number of digits reported for parameters in summary output.
+#' @param ... Other arguments passed into \code{print}, \code{summary} and \code{coef} functions. Currently not supported.
 #' 
 #' @details
 #' In case of dbRDA, the matrix of intersample distances is calculated using Whittaker's index of association (\code{\link{ia}}) and significance of the variation explained by sample attributes (R2) is tested by Monte Carlo permutation test. In case of Moran's I, the test is examining wheather the sample attributes variable is compositionally autocorrelated, i.e. whether the Moran's I calculated on this variable using as weighted inverted dissimilarities between sample's species composition is significant.
@@ -62,7 +63,7 @@ test.LR.0 <- function (M, env, type = 'dbRDA', alpha = 0.001, sqrt = F)
 
 #' @rdname test.LR
 #' @export
-print.testLR <- function (x, digits = 3)
+print.testLR <- function (x, digits = 3, ...)
 {
   symnum.pval <- function (pval) symnum( pval, corr = FALSE, na = FALSE, cutpoints = c(0, 0.001, 0.01, 0.05, 0.1, 1), symbols = c("***", "**", "*", ".", " "))
   names.speatt <- names (x)
@@ -81,16 +82,16 @@ print.testLR <- function (x, digits = 3)
 
 #' @rdname test.LR
 #' @export
-summary.testLR <- function (x)
-  print.default (x)
+summary.testLR <- function (object, ...)
+  print.default (object)
 
 #' @rdname test.LR
 #' @export
-coef.testLR <- function (x)
+coef.testLR <- function (object, ...)
 {
-  names.speatt <- names (x)
-  names.env <- names (x[[1]])
-  res <- lapply (x, FUN = function (sp) lapply (sp, FUN = function (en) 
+  names.speatt <- names (object)
+  names.env <- names (object[[1]])
+  res <- lapply (object, FUN = function (sp) lapply (sp, FUN = function (en) 
   {
     if (en$type == 'dbRDA') res.temp <- c(vegan::RsquareAdj (en$pcoa)$r.squared, en$anova[,'Pr(>F)'][1])
     if (en$type == 'moran') res.temp <- c(en$moran$observed, en$moran$p.value)
