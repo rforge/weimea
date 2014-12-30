@@ -24,10 +24,10 @@
 #' \item{\code{scenario = 4}}{There is no link between \bold{L} and \bold{Q}, neither between \bold{L} and \bold{R}. Matrices are created as in scenario 1, and afterwards the rows in both matrices \bold{R} and \bold{Q} are permuted, cancelling all links between matrices.}
 #' \item{\code{scenario = 0}}{This scenario represents the continuous transition between all above scenarios (1 to 4). Modifiying the proportion of noise in species attributes (argument \code{prop.noise.specatt}) and in sample attributes (argument \code{prop.noise.sampatt}) enables to create intermediary scenarios with varying degree to which the matrices are connected to each other. The following settings of arguments is analogous to the scenarios mentioned above:
 #' \itemize{
-#' \item \code{prop.noise.specatt = 0} and \code{prop.noise.sampatt = 0} is analogous to \code{scenario = 1}
-#' \item \code{prop.noise.specatt = 1} and \code{prop.noise.sampatt = 0} is analogous to \code{scenario = 2}
-#' \item \code{prop.noise.specatt = 0} and \code{prop.noise.sampatt = 1} is analogous to \code{scenario = 3}
-#' \item \code{prop.noise.specatt = 1} and \code{prop.noise.sampatt = 1} is analogous to \code{scenario = 4}
+#' \item \code{prop.noise.speatt = 0} and \code{prop.noise.env = 0} is analogous to \code{scenario = 1}
+#' \item \code{prop.noise.speatt = 1} and \code{prop.noise.env = 0} is analogous to \code{scenario = 2}
+#' \item \code{prop.noise.speatt = 0} and \code{prop.noise.env = 1} is analogous to \code{scenario = 3}
+#' \item \code{prop.noise.speatt = 1} and \code{prop.noise.env = 1} is analogous to \code{scenario = 4}
 #' }}}
 #' 
 #' 
@@ -84,7 +84,7 @@ simul.RLQ <- function (n = 100, p = 100, mi.tol = 10, scenario = 1, add.noise = 
   
   if (scenario == 0) 
   {
-    mi <- noise.var (mi, prop.noise.traits)
+    mi <- noise.var (mi, prop.noise.speatt)
     x <- noise.var (x, prop.noise.env)
   }
 
