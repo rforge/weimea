@@ -72,7 +72,8 @@ mopet <- function (M, env, method = c('lm'), cor.coef = c('pearson'), dependence
                   aov = expression (apply (as.matrix (M), 2, FUN = function (m) aov (m ~ env))),
                   cor = expression (apply (as.matrix (M), 2, FUN = function (m) cor.test (m, env, method = cor.coef))),
                   kruskal = expression (apply (as.matrix (M), 2, FUN = function (m) kruskal.test (m, env))),
-                  slope = expression (apply (as.matrix (M), 2, FUN = function (m) lm (scale (m, center = weighted.mean (m, rowSums (sitspe))) ~ ., as.data.frame (scale (env), center = weighted.mean (env, rowSums (sitspe))), weights = rowSums (sitspe)))),
+                  #slope = expression (apply (as.matrix (M), 2, FUN = function (m) lm (scale (m, center = weighted.mean (m, rowSums (sitspe))) ~ ., as.data.frame (scale (env), center = weighted.mean (env, rowSums (sitspe))), weights = rowSums (sitspe)))),
+                  slope = expression ({speatt <- attr (M, 'speatt'); sitspe <- attr (M, 'sitspe'); apply (speatt, 2, FUN = function (q) lm (wm (sitspe, scale (q, center = weighted.mean (q, colSums (sitspe)))) ~ scale (env, center = weighted.mean (env, rowSums (sitspe)))))}),
                   fourthcorner = expression (weimea::fourth.corner (R = R, L = L, Q = Q)))
   summ <- switch (method,
                   lm = expression (summary (obj)),
@@ -133,7 +134,7 @@ mopet <- function (M, env, method = c('lm'), cor.coef = c('pearson'), dependence
   {
     res.temp.stat.stand <- 
       if (method == 'fourthcorner') lapply (lapply (1:permutations, FUN = function (i) as.matrix (env)[sample (nrow (env)),]), FUN = function (env) lapply (with (list (R = env, L = sitspe, Q = speatt), eval (fun)), FUN = function (obj) with (list (obj = obj), eval (stat)))) else
-      if (method %in% c('aov', 'kruskal', 'cor', 'slope') || (method == 'lm' & dependence == 'env ~ M'))      lapply (lapply (1:permutations, FUN = function (i) as.matrix (M)[sample (nrow (M)),]), FUN = function (mat) lapply (apply (as.matrix (env), 2, FUN = function (i) with (list (M = mat, env = i), eval (fun))), FUN = function (obj) with (obj, eval (stat)))) else
+      if (method %in% c('aov', 'kruskal', 'cor', 'slope') || (method == 'lm' & dependence == 'env ~ M'))      lapply (lapply (1:permutations, FUN = function (i) as.matrix (env)[sample (nrow (env)),]), FUN = function (env.r) lapply (apply (as.matrix (env.r), 2, FUN = function (i) with (list (M = M, env = i), eval (fun))), FUN = function (obj) with (obj, eval (stat)))) else
       if (method == 'lm' & dependence == 'M ~ env') lapply (lapply (1:permutations, FUN = function (i) as.matrix (M)[sample (nrow (M)),]), FUN = function (mat) lapply (apply (as.matrix (mat), 2, FUN = function (i) with (list (M = i, env = env), eval (fun))), FUN = function (obj) with (obj, eval (stat))))
     res.temp.stat.stand <- rbind (matrix (unlist (res.temp.stat.stand), nrow = length (res.temp.stat.stand), byrow = T), unlist (res.real.stat))      
     perm.P <- (colSums (sweep (
