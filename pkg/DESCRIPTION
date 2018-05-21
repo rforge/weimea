@@ -1,0 +1,26 @@
+Package: weimea
+Type: Package
+Title: Weighted mean analysis
+Version: 0.1.0
+Date: 2018-05-21
+Author: David Zeleny
+Maintainer: David Zeleny <zeleny.david@gmail.com>
+Description: Analysing and testing the relationship community-
+    weighted mean (wei mea) of species attributes (traits, Ellenberg-type indicator values) and
+    sample attributes by methods of CWM approach, including max test (ter Braak et al. 2012) and
+    modified permutation test (Zeleny & Schaffers 2012). CWM approach with correlation, linear regression,
+    analysis of variance and design based functions available.
+LazyData: TRUE
+LinkingTo: Rcpp, RcppArmadillo
+Imports:
+    vegan,
+    ade4,
+    ape,
+    parallel,
+    RColorBrewer,
+    Rcpp (>= 0.12.1)
+Depends:
+    RcppArmadillo
+License: GPL-2
+RoxygenNote: 6.0.1
+SystemRequirements: GNU make
